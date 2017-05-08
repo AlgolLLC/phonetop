@@ -19,17 +19,27 @@ var twilio = new Twilio(accountSid, token);
 var tonumber = config.twilio.tonumber;
 var fromnumber = config.twilio.fromnumber;
 
-// Start the monitor
-monitor.start(config.events.monitorconfig);
+// Configure the monitor.
+var event_keys = Object.keys(config.events);
+var monitor_config = {};
+event_keys.map(function(event_key) {
+	monitor_config[event_key] = config.events[event_key].value
+});
 
-// Handler for event loadavg1
-monitor.on('loadavg1', function(event) {
-    console.log(event.type, ' Load average is exceptionally high!!!');
+// Start the monitor
+monitor.start(monitor_config);
+
+// Output the current config
+console.log(JSON.stringify(monitor.config()));
+
+
+// Function for sending SMS via twilio.
+var send_sms = function(message) {
     if(messagesSent < maxMessages) {
 		twilio.messages.create({
 			from: fromnumber,
 			to: tonumber,
-			body: hostname + ": " + config.events.critical1.message
+			body: hostname + ": " + message
 		}, function(err, result) {
 			if(err){
 				console.log("ERROR: " + JSON.stringify(err));
@@ -40,84 +50,35 @@ monitor.on('loadavg1', function(event) {
 	});
 	messagesSent++;
     }
+
+}
+
+// Handler for event loadavg1
+monitor.on('loadavg1', function(event) {
+    console.log(event.type, ' Load average is exceptionally high!!!');
+    send_sms(config.events.critical1.message);
 });
 
 // Handler for event loadavg5
 monitor.on('loadavg5', function(event) {
     console.log(event.type, ' Load average is exceptionally high!!!');
-    if(messagesSent < maxMessages) {
-		twilio.messages.create({
-			from: fromnumber,
-			to: tonumber,
-			body: hostname + ": " + config.events.critical5.message
-		}, function(err, result) {
-			if(err){
-				console.log("ERROR: " + JSON.stringify(err));
-			} else {
-				console.log('Created message using callback');
-				console.log(result.sid);
-			}
-	});
-	messagesSent++;
-    }
+    send_sms(config.events.critical5.message);
 });
 
 // Handler for event loadavg15
 monitor.on('loadavg15', function(event) {
     console.log(event.type, ' Load average is exceptionally high!!!');
-    if(messagesSent < maxMessages) {
-		twilio.messages.create({
-			from: fromnumber,
-			to: tonumber,
-			body: hostname + ": " + config.events.critical15.message
-		}, function(err, result) {
-			if(err){
-				console.log("ERROR: " + JSON.stringify(err));
-			} else {
-				console.log('Created message using callback');
-				console.log(result.sid);
-			}
-	});
-	messagesSent++;
-    }
+    send_sms(config.events.critical15.message);
 });
 
 // Handler for event freemem
 monitor.on('freemem', function(event) {
     console.log(event.type, ' Free memory is very low.');
-    if(messagesSent < maxMessages) {
-		twilio.messages.create({
-			from: fromnumber,
-			to: tonumber,
-			body: hostname + ": " + config.events.freemem.message
-		}, function(err, result) {
-			if(err){
-				console.log("ERROR: " + JSON.stringify(err));
-			} else {
-				console.log('Created message using callback');
-				console.log(result.sid);
-			}
-	});
-	messagesSent++;
-    }
+    send_sms(config.events.freemem.message);
 });
 
 // Handler for event uptime
 monitor.on('uptime', function(event) {
     console.log(event.type, ' Free memory is very low.');
-    if(messagesSent < maxMessages) {
-		twilio.messages.create({
-			from: fromnumber,
-			to: tonumber,
-			body: hostname + ": " + config.events.freemem.message
-		}, function(err, result) {
-			if(err){
-				console.log("ERROR: " + JSON.stringify(err));
-			} else {
-				console.log('Created message using callback');
-				console.log(result.sid);
-			}
-	});
-	messagesSent++;
-    }
+    send_sms(config.events.uptime.message);
 });

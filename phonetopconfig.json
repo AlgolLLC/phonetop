@@ -1,32 +1,29 @@
 {
     "events": {
-		"monitorconfig": {
-			"critical1": 0.2,
-			"critical5": 0.2,
-			"critical15": 0.2,
-			"uptime": 3000,
-			"freemem": 4000000000,
-			"delay": 60000
-		},
 		"critical1": {
+			"value": 0.2,
 			"message": "Over CPU load average for 1 minute."
 		},
 		"critical5": {
+			"value": 0.2,
 			"message": "Over CPU load average for 5 minutes."
 		},
 		"critical15": {
+			"value": 0.2,
 			"message": "Over CPU load average for 15 minutes."
 		},
 		"freemem": {
+			"value": 40000000000,
 			"message": "Free memory is very low."
 		},
 		"uptime": {
+			"value": 6000,
 			"message": "Congrats - your uptime is over threshold."
 		}
     },
     "twilio": {
-		"fromnumber": "",
-		"tonumber": "",
+		"fromnumber": "19016122698",
+		"tonumber": "19017304720",
 		"maxmessages": 0
 	}
 }
