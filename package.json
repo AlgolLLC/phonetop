@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/Longlius/phonetop#readme",
   "dependencies": {
+    "dotenv": "^4.0.0",
     "os-monitor": "^1.0.5",
     "twilio": "^3.0.0"
   }

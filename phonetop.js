@@ -2,6 +2,9 @@ var fs = require('fs');
 var monitor = require('os-monitor');
 var Twilio = require('./node_modules/twilio/lib');
 
+// read .env file and get twilio credentials
+require('dotenv').config()
+
 // get hostname
 var hostname = monitor.os.hostname();
 
@@ -75,6 +78,6 @@ monitor.on('freemem', function(event) {
 
 // Handler for event uptime
 monitor.on('uptime', function(event) {
-    console.log(event.type, ' Free memory is very low.');
+    console.log(event.type, ' Uptime exeeded threshold.');
     send_sms(config.events.uptime.message);
 });
