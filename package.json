@@ -4,7 +4,8 @@
   "description": "A node.js application to text your phone automatically about resource usage.",
   "main": "phonetop.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node phonetop.js"
   },
   "repository": {
     "type": "git",
