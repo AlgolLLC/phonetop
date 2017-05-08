@@ -109,7 +109,7 @@ monitor.on('uptime', function(event) {
 		twilio.messages.create({
 			from: fromnumber,
 			to: tonumber,
-			body: hostname + ": " + config.events.freemem.message
+			body: hostname + ": " + config.events.uptime.message
 		}, function(err, result) {
 			if(err){
 				console.log("ERROR: " + JSON.stringify(err));
