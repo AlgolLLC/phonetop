@@ -14,6 +14,9 @@ Once all the dependencies are installed, edit phonetopconfig.json to set the var
 Twilio credentials are passed through environment variables, so before running for the first time, export your twilio SID and auth token using:
 
 ```$ export TWILIO_ACCOUNT_SID=<twilio SID here>```
+
+and
+
 ```$ export TWILIO_AUTH_TOKEN=<twilio auth token here>```
 
 These values can be found on your twilio account dashboard.
