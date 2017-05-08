@@ -4,9 +4,9 @@
 			"critical1": 0.2,
 			"critical5": 0.2,
 			"critical15": 0.2,
-			"uptime": 100000000000,
-			"freemem": 1000000000,
-			"delay": 3000
+			"uptime": 3000,
+			"freemem": 4000000000,
+			"delay": 60000
 		},
 		"critical1": {
 			"message": "Over CPU load average for 1 minute."
@@ -19,10 +19,14 @@
 		},
 		"freemem": {
 			"message": "Free memory is very low."
+		},
+		"uptime": {
+			"message": "Congrats - your uptime is over threshold."
 		}
     },
     "twilio": {
 		"fromnumber": "",
-		"tonumber": ""
+		"tonumber": "",
+		"maxmessages": 0
 	}
 }

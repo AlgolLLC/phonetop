@@ -2,14 +2,15 @@ var fs = require('fs');
 var monitor = require('os-monitor');
 var Twilio = require('./node_modules/twilio/lib');
 
-// boolean to make sure we don't send too many messages
-var messageSent = false;
-
 // get hostname
 var hostname = monitor.os.hostname();
 
 // Read the configuration in from a file.
 var config = JSON.parse(fs.readFileSync('phonetopconfig.json', 'utf8'));
+
+// variables to make sure we don't send too many messages
+var messagesSent = 0;
+var maxMessages = config.twilio.maxmessages;
 
 // Twilio configuration (using environment variables)
 var accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -101,3 +102,22 @@ monitor.on('freemem', function(event) {
     }
 });
 
+// Handler for event uptime
+monitor.on('freemem', function(event) {
+    console.log(event.type, ' Free memory is very low.');
+    if(!messageSent) {
+		twilio.messages.create({
+			from: fromnumber,
+			to: tonumber,
+			body: hostname + ": " + config.events.freemem.message
+		}, function(err, result) {
+			if(err){
+				console.log("ERROR: " + JSON.stringify(err));
+			} else {
+				console.log('Created message using callback');
+				console.log(result.sid);
+			}
+	});
+	messageSent = true;
+    }
+});
