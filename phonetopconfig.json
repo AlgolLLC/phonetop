@@ -1,0 +1,10 @@
+{
+    "events": {
+	"monitorconfig": {
+	    "critical1": 0.2
+	},
+	"critical1": {
+	    "message": "HOLLA HOLLA GET A DOLLA"
+	}
+    }
+}
