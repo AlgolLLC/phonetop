@@ -25,4 +25,4 @@ These values can be found on your twilio account dashboard.
 
 Once everything is set, run the program:
 
-```$ node phonetop.js```
+```$ npm start```
