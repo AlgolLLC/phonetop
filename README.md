@@ -19,6 +19,8 @@ and
 
 ```$ export TWILIO_AUTH_TOKEN=<twilio auth token here>```
 
+You can also set these in a .env file located in the root of the application. See the [dotenv](https://www.npmjs.com/package/dotenv) package for more details.
+
 These values can be found on your twilio account dashboard.
 
 Once everything is set, run the program:

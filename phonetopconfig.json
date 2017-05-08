@@ -22,8 +22,8 @@
 		}
     },
     "twilio": {
-		"fromnumber": "19016122698",
-		"tonumber": "19017304720",
-		"maxmessages": 5
+		"fromnumber": "",
+		"tonumber": "",
+		"maxmessages": 0
 	}
 }
