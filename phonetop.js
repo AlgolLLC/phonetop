@@ -29,10 +29,6 @@ event_keys.map(function(event_key) {
 // Start the monitor
 monitor.start(monitor_config);
 
-// Output the current config
-console.log(JSON.stringify(monitor.config()));
-
-
 // Function for sending SMS via twilio.
 var send_sms = function(message) {
     if(messagesSent < maxMessages) {
