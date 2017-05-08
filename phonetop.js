@@ -25,7 +25,7 @@ monitor.start(config.events.monitorconfig);
 // Handler for event loadavg1
 monitor.on('loadavg1', function(event) {
     console.log(event.type, ' Load average is exceptionally high!!!');
-    if(!messageSent) {
+    if(messagesSent < maxMessages) {
 		twilio.messages.create({
 			from: fromnumber,
 			to: tonumber,
@@ -38,14 +38,14 @@ monitor.on('loadavg1', function(event) {
 				console.log(result.sid);
 			}
 	});
-	messageSent = true;
+	messagesSent++;
     }
 });
 
 // Handler for event loadavg5
 monitor.on('loadavg5', function(event) {
     console.log(event.type, ' Load average is exceptionally high!!!');
-    if(!messageSent) {
+    if(messagesSent < maxMessages) {
 		twilio.messages.create({
 			from: fromnumber,
 			to: tonumber,
@@ -58,14 +58,14 @@ monitor.on('loadavg5', function(event) {
 				console.log(result.sid);
 			}
 	});
-	messageSent = true;
+	messagesSent++;
     }
 });
 
 // Handler for event loadavg15
 monitor.on('loadavg15', function(event) {
     console.log(event.type, ' Load average is exceptionally high!!!');
-    if(!messageSent) {
+    if(messagesSent < maxMessages) {
 		twilio.messages.create({
 			from: fromnumber,
 			to: tonumber,
@@ -78,14 +78,14 @@ monitor.on('loadavg15', function(event) {
 				console.log(result.sid);
 			}
 	});
-	messageSent = true;
+	messagesSent++;
     }
 });
 
 // Handler for event freemem
 monitor.on('freemem', function(event) {
     console.log(event.type, ' Free memory is very low.');
-    if(!messageSent) {
+    if(messagesSent < maxMessages) {
 		twilio.messages.create({
 			from: fromnumber,
 			to: tonumber,
@@ -98,14 +98,14 @@ monitor.on('freemem', function(event) {
 				console.log(result.sid);
 			}
 	});
-	messageSent = true;
+	messagesSent++;
     }
 });
 
 // Handler for event uptime
-monitor.on('freemem', function(event) {
+monitor.on('uptime', function(event) {
     console.log(event.type, ' Free memory is very low.');
-    if(!messageSent) {
+    if(messagesSent < maxMessages) {
 		twilio.messages.create({
 			from: fromnumber,
 			to: tonumber,
@@ -118,6 +118,6 @@ monitor.on('freemem', function(event) {
 				console.log(result.sid);
 			}
 	});
-	messageSent = true;
+	messagesSent++;
     }
 });
