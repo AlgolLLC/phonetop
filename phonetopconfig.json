@@ -1,10 +1,28 @@
 {
     "events": {
-	"monitorconfig": {
-	    "critical1": 0.2
-	},
-	"critical1": {
-	    "message": "HOLLA HOLLA GET A DOLLA"
+		"monitorconfig": {
+			"critical1": 0.2,
+			"critical5": 0.2,
+			"critical15": 0.2,
+			"uptime": 100000000000,
+			"freemem": 1000000000,
+			"delay": 3000
+		},
+		"critical1": {
+			"message": "Over CPU load average for 1 minute."
+		},
+		"critical5": {
+			"message": "Over CPU load average for 5 minutes."
+		},
+		"critical15": {
+			"message": "Over CPU load average for 15 minutes."
+		},
+		"freemem": {
+			"message": "Free memory is very low."
+		}
+    },
+    "twilio": {
+		"fromnumber": "",
+		"tonumber": ""
 	}
-    }
 }
