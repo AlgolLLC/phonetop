@@ -28,6 +28,7 @@ var monitor_config = {};
 event_keys.map(function(event_key) {
 	monitor_config[event_key] = config.events[event_key].value
 });
+monitor_config['delay'] = config.misc.delay;
 
 // Start the monitor
 monitor.start(monitor_config);

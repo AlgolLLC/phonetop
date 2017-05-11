@@ -25,5 +25,8 @@
 		"fromnumber": "",
 		"tonumber": "",
 		"maxmessages": 0
+	},
+	"misc": {
+		"delay": 3000
 	}
 }
