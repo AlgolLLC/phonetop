@@ -1,5 +1,7 @@
 var fs = require('fs');
 var monitor = require('os-monitor');
+var express = require('express');
+var bodyParser = require('body-parser');
 var Twilio = require('./node_modules/twilio/lib');
 
 // read .env file and get twilio credentials
@@ -81,4 +83,19 @@ monitor.on('freemem', function(event) {
 monitor.on('uptime', function(event) {
     console.log(event.type, ' Uptime exeeded threshold.');
     send_sms(config.events.uptime.message);
+});
+
+// ---------------------------------------------------------------------------
+// --------------------------- EXPRESS SECTION -------------------------------
+// ---------------------------------------------------------------------------
+var app = express();
+app.use(bodyParser.text());
+
+app.post('/', function(req, res) {
+	res.send('<?xml version="1.0" encoding="UTF-8"?><Response><Message>Got response from ' + monitor.os.hostname() + '</Message></Response>');
+	console.log(req.body);
+});
+
+app.listen(2000, function() {
+	console.log('Listening on port 2000...');
 });
