@@ -123,6 +123,13 @@ var cmdHandlers = {
 			var retMessage = 'CPU status report from ' + hostname + ': 1 minute avg - ' + normalizedLoadAverages['1'] + '%, 5 minute avg - ' + normalizedLoadAverages['5'] + '%, 15 minute avg - ' + normalizedLoadAverages['15'] + '%';
 			twiMsg(retMessage, res);
 		}
+	},
+	"memstatus": {
+		handler: function(res) {
+			var freeBytes = monitor.os.freemem();
+			var retMessage = 'Memory status report from ' + hostname + ': ' + freeBytes + ' bytes free of memory.';
+			twiMsg(retMessage, res);
+		}
 	}
 };
 
