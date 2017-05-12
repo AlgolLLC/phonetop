@@ -10,6 +10,9 @@ require('dotenv').config()
 // get hostname
 var hostname = monitor.os.hostname();
 
+// get number of CPUS
+var numCPUs = monitor.os.cpus().length;
+
 // Read the configuration in from a file.
 var config = JSON.parse(fs.readFileSync('phonetopconfig.json', 'utf8'));
 
@@ -24,6 +27,9 @@ var twilio = new Twilio(accountSid, token);
 var tonumber = config.twilio.tonumber;
 var fromnumber = config.twilio.fromnumber;
 
+// ---------------------------------------------------------------------------
+// --------------------------- MONITOR SECTION -------------------------------
+// ---------------------------------------------------------------------------
 // Configure the monitor.
 var event_keys = Object.keys(config.events);
 var monitor_config = {};
@@ -86,14 +92,47 @@ monitor.on('uptime', function(event) {
 });
 
 // ---------------------------------------------------------------------------
+// ----------------------- UTILITY FUNCTION SECTION --------------------------
+// ---------------------------------------------------------------------------
+var twiMsg = function(msg, res) {
+	var twistr = '<?xml version="1.0" encoding="UTF-8"?><Response><Message>' + msg + '</Message></Response>';
+	res.send(twistr);
+};
+
+
+// ---------------------------------------------------------------------------
+// ---------------------------- HANDLER SECTION ------------------------------
+// ---------------------------------------------------------------------------
+var cmdHandlers = {
+	"cpustatus": {
+		handler: function(res) {
+			var loadaverages = monitor.os.loadavg();
+			var normalizedLoadAverages = {
+				"1": ((loadaverages[0] / numCPUs) * 100),
+				"5": ((loadaverages[1] / numCPUs) * 100),
+				"15": ((loadaverages[2] / numCPUs) * 100)
+			};
+			var retMessage = 'CPU status report from ' + hostname + ': 1 minute avg - ' + normalizedLoadAverages['1'] + '%, 5 minute avg - ' + normalizedLoadAverages['5'] + '%, 15 minute avg - ' + normalizedLoadAverages['15'] + '%';
+			twiMsg(retMessage, res);
+		}
+	}
+};
+
+// ---------------------------------------------------------------------------
 // --------------------------- EXPRESS SECTION -------------------------------
 // ---------------------------------------------------------------------------
 var app = express();
-app.use(bodyParser.text());
+app.use(bodyParser.urlencoded({extended: false}));
 
-app.post('/', function(req, res) {
-	res.send('<?xml version="1.0" encoding="UTF-8"?><Response><Message>Got response from ' + monitor.os.hostname() + '</Message></Response>');
-	console.log(req.body);
+app.post('/cmd', Twilio.webhook(), function(req, res) {
+	var smsBody = req.body['Body'];
+	var cmd = (smsBody.split(" ")[0]).toLowerCase();
+	console.log('DEBUG: ' + cmd + ' is input.');
+	if(cmd in cmdHandlers) {
+		cmdHandlers[cmd].handler(res);
+	} else {
+		twiMsg('Command ' + cmd + ' not supported.', res);
+	}
 });
 
 app.listen(2000, function() {
