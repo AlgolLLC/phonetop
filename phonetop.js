@@ -10,8 +10,6 @@ require('dotenv').config()
 // get hostname
 var hostname = monitor.os.hostname();
 
-// get number of CPUS
-var numCPUs = monitor.os.cpus().length;
 
 // Read the configuration in from a file.
 var config = JSON.parse(fs.readFileSync('phonetopconfig.json', 'utf8'));
@@ -106,11 +104,21 @@ var twiMsg = function(msg, res) {
 var cmdHandlers = {
 	"cpustatus": {
 		handler: function(res) {
+			var numCPUs = monitor.os.cpus().length;
 			var loadaverages = monitor.os.loadavg();
+			var loadaverage_1 = ((loadaverages[0] / numCPUs) * 100).toFixed(1);
+			var loadaverage_5 = ((loadaverages[1] / numCPUs) * 100).toFixed(1);
+			var loadaverage_15 = ((loadaverages[2] / numCPUs) * 100).toFixed(1);
+
+			// Catch bugs with calculations and lower precision for shorter text messages..
+			loadaverage_1 = isFinite(loadaverage_1) ? loadaverage_1 : "ERR";
+			loadaverage_5 = isFinite(loadaverage_5) ? loadaverage_5 : "ERR";
+			loadaverage_15 = isFinite(loadaverage_15) ? loadaverage_15 : "ERR";
+
 			var normalizedLoadAverages = {
-				"1": ((loadaverages[0] / numCPUs) * 100),
-				"5": ((loadaverages[1] / numCPUs) * 100),
-				"15": ((loadaverages[2] / numCPUs) * 100)
+				"1": loadaverage_1,
+				"5": loadaverage_5,
+				"15": loadaverage_15
 			};
 			var retMessage = 'CPU status report from ' + hostname + ': 1 minute avg - ' + normalizedLoadAverages['1'] + '%, 5 minute avg - ' + normalizedLoadAverages['5'] + '%, 15 minute avg - ' + normalizedLoadAverages['15'] + '%';
 			twiMsg(retMessage, res);
