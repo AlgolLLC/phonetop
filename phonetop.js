@@ -163,6 +163,6 @@ app.post('/cmd', Twilio.webhook(), function(req, res) {
 	}
 });
 
-app.listen(2000, function() {
-	console.log('Listening on port 2000...');
+app.listen(config['misc']['port'], function() {
+	console.log('Listening on port ' + config['misc']['port'] + '...');
 });
