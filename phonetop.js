@@ -1,5 +1,6 @@
 var fs = require('fs');
 var monitor = require('os-monitor');
+var exec = require('child_process').exec
 var express = require('express');
 var bodyParser = require('body-parser');
 var Twilio = require('./node_modules/twilio/lib');
@@ -129,6 +130,18 @@ var cmdHandlers = {
 			var freeBytes = monitor.os.freemem();
 			var retMessage = 'Memory status report from ' + hostname + ': ' + freeBytes + ' bytes free of memory.';
 			twiMsg(retMessage, res);
+		}
+	},
+	"procstatus": {
+		handler: function(res) {
+			exec.cmd('ps -eo comm,pid,pcpu,pmem', function(error, stdout, stderror) {
+				if(error) {
+					console.log('ERROR: ' + error);
+					twiMsg('Could not get process list. Please contact your system administrator.', res);
+				} else {
+					twiMsg('Process listing for ' + hostname + ':\n' + stdout, res);
+				}
+			});
 		}
 	}
 };
