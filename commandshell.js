@@ -1,5 +1,6 @@
 var exec = require('child_process').exec;
 var os = require('os');
+var express = require('express');
 
 class CommandShell {
 	constructor() {
