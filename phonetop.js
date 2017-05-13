@@ -5,6 +5,10 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var Twilio = require('./node_modules/twilio/lib');
 
+// import commandshell class
+var CommandShell = require('./commandshell.js').CommandShell;
+var csh = new CommandShell();
+
 // read .env file and get twilio credentials
 require('dotenv').config()
 
@@ -98,54 +102,6 @@ var twiMsg = function(msg, res) {
 	res.send(twistr);
 };
 
-
-// ---------------------------------------------------------------------------
-// ---------------------------- HANDLER SECTION ------------------------------
-// ---------------------------------------------------------------------------
-var cmdHandlers = {
-	"cpustatus": {
-		handler: function(res) {
-			var numCPUs = monitor.os.cpus().length;
-			var loadaverages = monitor.os.loadavg();
-			var loadaverage_1 = ((loadaverages[0] / numCPUs) * 100).toFixed(1);
-			var loadaverage_5 = ((loadaverages[1] / numCPUs) * 100).toFixed(1);
-			var loadaverage_15 = ((loadaverages[2] / numCPUs) * 100).toFixed(1);
-
-			// Catch bugs with calculations and lower precision for shorter text messages..
-			loadaverage_1 = isFinite(loadaverage_1) ? loadaverage_1 : "ERR";
-			loadaverage_5 = isFinite(loadaverage_5) ? loadaverage_5 : "ERR";
-			loadaverage_15 = isFinite(loadaverage_15) ? loadaverage_15 : "ERR";
-
-			var normalizedLoadAverages = {
-				"1": loadaverage_1,
-				"5": loadaverage_5,
-				"15": loadaverage_15
-			};
-			var retMessage = 'CPU status report from ' + hostname + ': 1 minute avg - ' + normalizedLoadAverages['1'] + '%, 5 minute avg - ' + normalizedLoadAverages['5'] + '%, 15 minute avg - ' + normalizedLoadAverages['15'] + '%';
-			twiMsg(retMessage, res);
-		}
-	},
-	"memstatus": {
-		handler: function(res) {
-			var freeBytes = monitor.os.freemem();
-			var retMessage = 'Memory status report from ' + hostname + ': ' + freeBytes + ' bytes free of memory.';
-			twiMsg(retMessage, res);
-		}
-	},
-	"procstatus": {
-		handler: function(res) {
-			exec.cmd('ps -eo comm,pid,pcpu,pmem', function(error, stdout, stderror) {
-				if(error) {
-					console.log('ERROR: ' + error);
-					twiMsg('Could not get process list. Please contact your system administrator.', res);
-				} else {
-					twiMsg('Process listing for ' + hostname + ':\n' + stdout, res);
-				}
-			});
-		}
-	}
-};
-
 // ---------------------------------------------------------------------------
 // --------------------------- EXPRESS SECTION -------------------------------
 // ---------------------------------------------------------------------------
@@ -154,13 +110,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 app.post('/cmd', Twilio.webhook(), function(req, res) {
 	var smsBody = req.body['Body'];
-	var cmd = (smsBody.split(" ")[0]).toLowerCase();
-	console.log('DEBUG: ' + cmd + ' is input.');
-	if(cmd in cmdHandlers) {
-		cmdHandlers[cmd].handler(res);
-	} else {
-		twiMsg('Command ' + cmd + ' not supported.', res);
-	}
+	csh.parseCommand(smsBody.toLowerCase());
 });
 
 app.listen(config['misc']['port'], function() {

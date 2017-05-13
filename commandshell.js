@@ -1,7 +1,7 @@
 var exec = require('child_process').exec;
 var os = require('os');
 
-var CommandShell = class {
+class CommandShell {
 	constructor() {
 		this.handlers = {
 			"cpustatus": {
@@ -20,25 +20,26 @@ var CommandShell = class {
 						"5": loadaverage_5,
 						"15": loadaverage_15
 					};
-					var retMessage = 'CPU status report from ' + hostname + ': 1 minute avg - ' + normalizedLoadAverages['1'] + '%, 5 minute avg - ' + normalizedLoadAverages['5'] + '%, 15 minute avg - ' + normalizedLoadAverages['15'] + '%';
-					twiMsg(retMessage, res);
+					var retMessage = 'CPU status report from ' + os.hostname() + ': 1 minute avg - ' + normalizedLoadAverages['1'] + '%, 5 minute avg - ' + normalizedLoadAverages['5'] + '%, 15 minute avg - ' + normalizedLoadAverages['15'] + '%';
+					CommandShell.twiMsg(retMessage, res);
 				}
 			},
 			"memstatus": {
 				"handler": function(cmdArr, res) {
-					var freeBytes = monitor.os.freemem();
-					var retMessage = 'Memory status report from ' + hostname + ': ' + freeBytes + ' bytes free of memory.';
-					twiMsg(retMessage, res);
+					var freeBytes = os.freemem();
+					var retMessage = 'Memory status report from ' + os.hostname() + ': ' + freeBytes + ' bytes free of memory.';
+					CommandShell.twiMsg(retMessage, res);
 				}
 			},
-			"procstatus" {
+			"procstatus": {
 				"handler": function(cmdArr, res) {
-					exec.cmd('ps -eo comm,pid,pcpu,pmem', function(error, stdout, stderror) {
+					exec('ps -eo comm,pid,pcpu,pmem', function(error, stdout, stderror) {
 						if(error) {
 							console.log('ERROR: ' + error);
-							twiMsg('Could not get process list. Please contact your system administrator.', res);
+							CommandShell.twiMsg('Could not get process list. Please contact your system administrator.', res);
 						} else {
-							twiMsg('Process listing for ' + hostname + ':\n' + stdout, res);
+							var retMessage = 'Process listing for ' + os.hostname() + ':\n' + stdout;
+							CommandShell.twiMsg(retMessage, res);
 						}
 					});
 				}
@@ -46,12 +47,12 @@ var CommandShell = class {
 		};	
 	}
 	
-	parseCommand(cmdstr) {
+	parseCommand(cmdstr, res) {
 		var splitCmd = cmdstr.split(' ');
-		if(splitCmd[0] in handlers) {
-			return splitCmd;
+		if(splitCmd[0] in this.handlers) {
+			this.handlers[splitCmd[0]]['handler'](splitCmd.slice(1), res);
 		} else {
-			return null;
+			twiMsg('Command ' + splitCmd[0] + ' not supported.', res);
 		}
 	}
 	
@@ -69,6 +70,8 @@ var CommandShell = class {
 	
 	static twiMsg(msg, res) {
 		var twistr = '<?xml version="1.0" encoding="UTF-8"?><Response><Message>' + msg + '</Message></Response>';
-		res.send(twiStr);
+		res.send(twistr);
 	}
 };
+
+exports.CommandShell = CommandShell;
