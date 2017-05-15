@@ -6,7 +6,7 @@ class CommandShell {
 	constructor() {
 		this.handlers = {
 			"cpustatus": {
-				"handler": function(cmdArr, res) {
+				"handler": function(cmdArr, callback) {
 					var numCPUs = os.cpus().length;
 					var loadaverages = os.loadavg();
 					var loadaverage_1 = ((loadaverages[0] / numCPUs) * 100).toFixed(1);
@@ -22,25 +22,25 @@ class CommandShell {
 						"15": loadaverage_15
 					};
 					var retMessage = 'CPU status report from ' + os.hostname() + ': 1 minute avg - ' + normalizedLoadAverages['1'] + '%, 5 minute avg - ' + normalizedLoadAverages['5'] + '%, 15 minute avg - ' + normalizedLoadAverages['15'] + '%';
-					CommandShell.twiMsg(retMessage, res);
+					callback(retMessage);
 				}
 			},
 			"memstatus": {
-				"handler": function(cmdArr, res) {
+				"handler": function(cmdArr, callback) {
 					var freeBytes = os.freemem();
 					var retMessage = 'Memory status report from ' + os.hostname() + ': ' + freeBytes + ' bytes free of memory.';
-					CommandShell.twiMsg(retMessage, res);
+					callback(retMessage);
 				}
 			},
 			"procstatus": {
-				"handler": function(cmdArr, res) {
+				"handler": function(cmdArr, callback) {
 					exec('ps -eo comm,pid,pcpu,pmem', function(error, stdout, stderror) {
 						if(error) {
 							console.log('ERROR: ' + error);
-							CommandShell.twiMsg('Could not get process list. Please contact your system administrator.', res);
+							callback('Could not get process list. Please contact your system administrator.');
 						} else {
 							var retMessage = 'Process listing for ' + os.hostname() + ':\n' + stdout;
-							CommandShell.twiMsg(retMessage, res);
+							callback(retMessage);
 						}
 					});
 				}
@@ -48,12 +48,12 @@ class CommandShell {
 		};	
 	}
 	
-	parseCommand(cmdstr, res) {
+	parseCommand(cmdstr, callback) {
 		var splitCmd = cmdstr.split(' ');
 		if(splitCmd[0] in this.handlers) {
-			this.handlers[splitCmd[0]]['handler'](splitCmd.slice(1), res);
+			this.handlers[splitCmd[0]]['handler'](splitCmd.slice(1), callback);
 		} else {
-			twiMsg('Command ' + splitCmd[0] + ' not supported.', res);
+			callback('Command ' + splitCmd[0] + ' not supported.');
 		}
 	}
 	
@@ -67,11 +67,6 @@ class CommandShell {
 	
 	getHandlers() {
 		return this.handlers;
-	}
-	
-	static twiMsg(msg, res) {
-		var twistr = '<?xml version="1.0" encoding="UTF-8"?><Response><Message>' + msg + '</Message></Response>';
-		res.send(twistr);
 	}
 };
 

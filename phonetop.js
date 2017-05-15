@@ -110,7 +110,12 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 app.post('/cmd', Twilio.webhook(), function(req, res) {
 	var smsBody = req.body['Body'];
-	csh.parseCommand(smsBody.toLowerCase(), res);
+	var twiMsg = function(msg) {
+		var response = res;
+		var twistr = '<?xml version="1.0" encoding="UTF-8"?><Response><Message>' + msg + '</Message></Response>';
+		response.send(twistr);
+	};
+	csh.parseCommand(smsBody.toLowerCase(), twiMsg);
 });
 
 app.listen(config['misc']['port'], function() {
